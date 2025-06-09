@@ -1,1 +1,6 @@
+/    /index.html   200
 /*    /index.html   200
+/traffic    /traffic.html   200
+/traffic/*    /traffic.html   200
+/404    /404.html   404
+/500    /500.html   500
