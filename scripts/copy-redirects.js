@@ -9,12 +9,18 @@ const __dirname = dirname(__filename);
 const redirectsPath = path.join(__dirname, '../_redirects');
 const distPath = path.join(__dirname, '../dist/_redirects');
 
-try {
-    if (await fs.promises.access(redirectsPath)) {
+async function copyRedirects() {
+    try {
+        await fs.promises.access(redirectsPath);
         await fs.promises.copyFile(redirectsPath, distPath);
-    } else {
-        console.log('No _redirects file found');
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            console.log('No _redirects file found');
+        } else {
+            console.error('Error copying redirects:', error);
+        }
     }
-} catch (error) {
-    console.error('Error copying redirects:', error);
 }
+
+// Execute the function
+await copyRedirects();
