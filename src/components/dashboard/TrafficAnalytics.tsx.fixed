@@ -1,0 +1,238 @@
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar } from 'recharts';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AlertTriangle } from 'lucide-react';
+
+// Mock data for traffic analytics
+const hourlyData = [
+  { time: '00:00', volume: 720, congestion: 15, incidents: 0 },
+  { time: '04:00', volume: 850, congestion: 18, incidents: 1 },
+  { time: '08:00', volume: 2100, congestion: 68, incidents: 3 },
+  { time: '12:00', volume: 1800, congestion: 55, incidents: 2 },
+  { time: '16:00', volume: 2400, congestion: 75, incidents: 4 },
+  { time: '20:00', volume: 1500, congestion: 45, incidents: 1 },
+];
+
+const dailyData = [
+  { day: 'Mon', volume: 15200, congestion: 42, incidents: 8 },
+  { day: 'Tue', volume: 14800, congestion: 38, incidents: 7 },
+  { day: 'Wed', volume: 15600, congestion: 45, incidents: 9 },
+  { day: 'Thu', volume: 16200, congestion: 50, incidents: 11 },
+  { day: 'Fri', volume: 18400, congestion: 62, incidents: 14 },
+  { day: 'Sat', volume: 12800, congestion: 30, incidents: 5 },
+  { day: 'Sun', volume: 9800, congestion: 22, incidents: 3 },
+];
+
+const junctionData = [
+  { name: 'Main & Broadway', volume: 8500, congestion: 65 },
+  { name: 'Central Ave', volume: 7200, congestion: 48 },
+  { name: 'Park Road', volume: 4500, congestion: 30 },
+  { name: 'Market St', volume: 6800, congestion: 42 },
+  { name: 'Tech Corridor', volume: 9200, congestion: 70 },
+];
+
+// --- Reports Section helpers ---
+const mockReports = [
+  { id: 1, type: 'Speeding', location: 'Main St', timestamp: '2025-05-02T19:30:00+05:30', severity: 'high', status: 'pending', description: 'Detected by camera' },
+  { id: 2, type: 'Signal Violation', location: 'Tech Corridor', timestamp: '2025-05-02T18:00:00+05:30', severity: 'medium', status: 'investigating', description: 'Manual report' },
+  { id: 3, type: 'Illegal Parking', location: 'Downtown', timestamp: '2025-05-01T22:00:00+05:30', severity: 'low', status: 'resolved', description: 'Detected by patrol' },
+  { id: 4, type: 'Reckless Driving', location: 'Central Avenue', timestamp: '2025-05-02T20:00:00+05:30', severity: 'high', status: 'pending', description: 'Detected by camera' },
+  { id: 5, type: 'Speeding', location: 'Park Road', timestamp: '2025-05-02T15:30:00+05:30', severity: 'medium', status: 'resolved', description: 'Detected by camera' },
+];
+
+const statusClass = (status: string) => {
+  switch (status) {
+    case 'pending': return 'bg-yellow-500 text-white px-2 py-1 rounded text-xs';
+    case 'investigating': return 'bg-blue-500 text-white px-2 py-1 rounded text-xs';
+    case 'resolved': return 'bg-green-500 text-white px-2 py-1 rounded text-xs';
+    default: return 'bg-gray-500 text-white px-2 py-1 rounded text-xs';
+  }
+};
+
+const severityClass = (sev: string) => {
+  switch (sev) {
+    case 'high': return 'text-red-500 font-bold';
+    case 'medium': return 'text-orange-500 font-bold';
+    case 'low': return 'text-yellow-500 font-bold';
+    default: return 'text-gray-500';
+  }
+};
+
+const TrafficAnalytics = () => {
+  return (
+    <>
+      {/* Traffic Analytics Card */}
+      <Card className="col-span-2">
+        <CardHeader>
+          <CardTitle>Traffic Analytics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="hourly">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="hourly">Today (Hourly)</TabsTrigger>
+              <TabsTrigger value="daily">This Week</TabsTrigger>
+              <TabsTrigger value="junctions">By Junction</TabsTrigger>
+            </TabsList>
+            <TabsContent value="hourly" className="mt-4">
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={hourlyData}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f1" />
+                    <XAxis dataKey="time" tick={{ fontSize: 12 }} />
+                    <YAxis yAxisId="left" tick={{ fontSize: 12 }} />
+                    <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                      yAxisId="left"
+                      type="monotone"
+                      dataKey="volume"
+                      name="Traffic Volume"
+                      stroke="#0ea5e9"
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
+                    <Line
+                      yAxisId="right"
+                      type="monotone"
+                      dataKey="congestion"
+                      name="Congestion %"
+                      stroke="#ef4444"
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </TabsContent>
+            <TabsContent value="daily" className="mt-4">
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={dailyData}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f1" />
+                    <XAxis dataKey="day" tick={{ fontSize: 12 }} />
+                    <YAxis yAxisId="left" tick={{ fontSize: 12 }} />
+                    <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                      yAxisId="left"
+                      type="monotone"
+                      dataKey="volume"
+                      name="Daily Traffic"
+                      stroke="#0ea5e9"
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                    />
+                    <Line
+                      yAxisId="right"
+                      type="monotone"
+                      dataKey="incidents"
+                      name="Incidents"
+                      stroke="#f97316"
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </TabsContent>
+            <TabsContent value="junctions" className="mt-4">
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={junctionData}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    barSize={20}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f1" />
+                    <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                    <YAxis yAxisId="left" tick={{ fontSize: 12 }} />
+                    <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} />
+                    <Tooltip />
+                    <Legend />
+                    <Bar
+                      yAxisId="left"
+                      dataKey="volume"
+                      name="Traffic Volume"
+                      fill="#0ea5e9"
+                      radius={[4, 4, 0, 0]}
+                    />
+                    <Bar
+                      yAxisId="right"
+                      dataKey="congestion"
+                      name="Congestion %"
+                      fill="#ef4444"
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+      {/* Reports Section */}
+      <Card className="col-span-2 mt-6">
+        <CardHeader>
+          <CardTitle>Reports</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {mockReports.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No reports found.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {mockReports.slice(0, 5).map((report) => (
+                <div key={report.id} className="p-3 border rounded-md hover:bg-slate-50 transition-colors">
+                  <div className="flex justify-between">
+                    <div>
+                      <div className="font-medium flex items-center">
+                        {report.type === 'Speeding' ? <span className="mr-1">🚗</span> :
+                          report.type === 'Signal Violation' ? <span className="mr-1">🚦</span> :
+                          <AlertTriangle size={16} className="mr-1" />}
+                        {report.type}
+                      </div>
+                      <div className="text-xs text-muted-foreground flex items-center mt-1">
+                        <span className="mr-1">📍</span>
+                        {report.location}
+                      </div>
+                    </div>
+                    <span className={statusClass(report.status)}>
+                      {report.status}
+                    </span>
+                  </div>
+                  <div className="flex justify-between mt-3 items-center">
+                    <div className="flex items-center">
+                      <span className="mr-1">🕒</span>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(report.timestamp).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className={`text-xs font-medium ${severityClass(report.severity)}`}>
+                      {report.severity.toUpperCase()} severity
+                    </div>
+                  </div>
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    {report.description}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </>
+  );
+};
+
+export default TrafficAnalytics;
